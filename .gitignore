@@ -1,0 +1,9 @@
+# Ignore OS files
+Thumbs.db
+Desktop.ini
+
+# Ignore VS Code settings
+.vscode/
+
+# Ignore docs if requested
+QL/docs/
