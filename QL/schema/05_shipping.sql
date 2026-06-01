@@ -1,0 +1,17 @@
+-- don_vi_van_chuyen
+-- - don_vi_id (PK)
+-- - ten_don_vi
+-- - so_dien_thoai
+-- - email
+-- - website
+-- - trang_thai
+
+-- van_chuyen
+-- - van_chuyen_id (PK)
+-- - don_hang_id (FK -> don_hang)
+-- - don_vi_id (FK -> don_vi_van_chuyen)
+-- - ma_van_don
+-- - trang_thai
+-- - ngay_gui
+-- - ngay_nhan_du_kien
+-- - ngay_nhan_thuc_te

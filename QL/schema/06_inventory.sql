@@ -1,0 +1,15 @@
+-- kho_hang
+-- - kho_hang_id (PK)
+-- - ten_kho
+-- - dia_chi
+-- - ghi_chu
+-- - created_at
+-- - updated_at
+
+-- ton_kho
+-- - ton_kho_id (PK)
+-- - kho_hang_id (FK -> kho_hang)
+-- - san_pham_id (FK -> san_pham)
+-- - so_luong
+-- - created_at
+-- - updated_at

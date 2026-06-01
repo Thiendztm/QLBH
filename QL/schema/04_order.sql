@@ -1,0 +1,31 @@
+-- don_hang
+-- - don_hang_id (PK)
+-- - nguoi_dung_id (FK -> nguoi_dung)
+-- - dia_chi_id (FK -> dia_chi_giao_hang)
+-- - tong_tien
+-- - phi_van_chuyen
+-- - trang_thai
+-- - created_at
+-- - updated_at
+
+-- chi_tiet_don_hang
+-- - chi_tiet_id (PK)
+-- - don_hang_id (FK -> don_hang)
+-- - san_pham_id (FK -> san_pham)
+-- - so_luong
+-- - don_gia
+-- - thanh_tien
+
+-- phuong_thuc_thanh_toan
+-- - phuong_thuc_id (PK)
+-- - ten_phuong_thuc
+-- - loai (cod/online)
+-- - trang_thai
+
+-- thanh_toan
+-- - thanh_toan_id (PK)
+-- - don_hang_id (FK -> don_hang)
+-- - phuong_thuc_id (FK -> phuong_thuc_thanh_toan)
+-- - so_tien
+-- - trang_thai
+-- - thoi_diem_thanh_toan

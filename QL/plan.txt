@@ -1,0 +1,52 @@
+PROJECT: Quản lý bán hàng online (tập trung SQL, MySQL)
+
+1) Mô tả tổng quan (viết lại ngắn gọn theo hướng CSDL)
+- Mục tiêu: thiết kế CSDL cho hệ thống bán hàng online (marketplace) với nhiều người mua
+  và sản phẩm/tồn kho, đặt hàng, thanh toán, vận chuyển.
+- Phạm vi: tập trung mô hình dữ liệu, ràng buộc, chỉ mục, truy vấn mẫu; có UI đơn giản.
+- Công nghệ: MySQL. Không triển khai web/UI, không cần backend.
+
+2) Thực thể và quan hệ chính (dự kiến)
+- nguoi_dung: lưu thông tin tài khoản người mua (có thể gộp vai trò admin).
+- danh_muc: phân loại sản phẩm.
+- san_pham: thông tin sản phẩm (thuộc danh_muc).
+- kho_hang: thông tin kho/vị trí lưu trữ.
+- ton_kho: số lượng theo san_pham và kho.
+- don_hang: thông tin đặt hàng.
+- chi_tiet_don_hang: sản phẩm và số lượng trong đơn.
+- phuong_thuc_thanh_toan: COD, chuyển khoản, ví điện tử...
+- thanh_toan: trạng thái/thời điểm thanh toán cho đơn.
+- dia_chi_giao_hang: địa chỉ giao của người dùng.
+- don_vi_van_chuyen: đối tác giao hàng.
+- van_chuyen: thông tin vận đơn và trạng thái giao hàng.
+
+3) Yêu cầu nghiệp vụ (tóm tắt)
+- Mỗi don_hang có >= 1 chi_tiet_don_hang.
+- Mỗi san_pham thuộc 1 danh_muc.
+- Tồn kho được quản lý theo san_pham và kho_hang.
+- Don_hang có thể thanh toán COD hoặc online.
+- Van_chuyen liên kết don_hang và don_vi_van_chuyen.
+
+4) Đầu ra cần nộp (gợi ý)
+- ERD (sơ đồ quan hệ).
+- File SQL: tạo DB, tạo bảng, ràng buộc, chỉ mục.
+- Truy vấn mẫu: thống kê đơn hàng, top sản phẩm, tồn kho thấp...
+- Data mẫu (nếu cần) để demo truy vấn và kiểm thử ràng buộc.
+- UI đơn giản (mockup hoặc mô tả màn hình), không cần triển khai code.
+
+5) UI tối giản (gợi ý)
+- Đăng nhập/đăng ký (chỉ mô tả luồng).
+- Danh sách sản phẩm + tìm kiếm.
+- Chi tiết sản phẩm.
+- Giỏ hàng + đặt hàng.
+- Lịch sử đơn hàng.
+
+BẢNG PHÂN CÔNG (5 người)
+
+Người | Bảng phụ trách | Câu truy vấn phụ trách | Đầu ra
+----- | -------------- | --------------------- | ------
+A     | nguoi_dung, dia_chi_giao_hang | danh sách người dùng, tìm theo email/sđt, địa chỉ mặc định | schema/02_core.sql + queries/core.sql
+B     | danh_muc, san_pham, kho_hang, ton_kho | top sản phẩm, tồn kho thấp, sản phẩm theo danh mục | schema/03_catalog.sql + schema/06_inventory.sql + queries/catalog_inventory.sql
+C     | don_hang, chi_tiet_don_hang, phuong_thuc_thanh_toan, thanh_toan | doanh thu theo ngày, đơn chưa thanh toán, chi tiết đơn | schema/04_order.sql + queries/order_payment.sql
+D     | don_vi_van_chuyen, van_chuyen | đơn đang giao, đơn trễ, thống kê theo đơn vị vận chuyển | schema/05_shipping.sql + queries/shipping.sql
+E     | kho_hang, ton_kho | ton kho theo kho, san pham sap het, so luong theo danh muc | schema/06_inventory.sql + queries/inventory.sql

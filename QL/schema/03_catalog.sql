@@ -1,0 +1,17 @@
+-- danh_muc
+-- - danh_muc_id (PK)
+-- - ten_danh_muc
+-- - danh_muc_cha_id (FK -> danh_muc, nullable)
+-- - mo_ta
+-- - created_at
+-- - updated_at
+
+-- san_pham
+-- - san_pham_id (PK)
+-- - danh_muc_id (FK -> danh_muc)
+-- - ten_san_pham
+-- - mo_ta
+-- - gia_co_ban
+-- - trang_thai
+-- - created_at
+-- - updated_at
