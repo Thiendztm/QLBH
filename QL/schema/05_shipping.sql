@@ -10,7 +10,7 @@ CREATE TABLE don_vi_van_chuyen (
 
 CREATE TABLE van_chuyen (
     van_chuyen_id INT AUTO_INCREMENT PRIMARY KEY,
-    don_hang_id don_hang_id tinyint not null
+    don_hang_id tinyint not null,
     don_vi_id INT NOT NULL,
     ma_van_don VARCHAR(50) NOT NULL UNIQUE,
     trang_thai ENUM(
@@ -26,5 +26,3 @@ CREATE TABLE van_chuyen (
     FOREIGN KEY (don_hang_id) REFERENCES don_hang(don_hang_id)
 );
 
-drop table if exists don_vi_van_chuyen;
-drop table if exists van_chuyen;

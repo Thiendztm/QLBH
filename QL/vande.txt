@@ -1,0 +1,2 @@
+Bóng ma:
+ví dụ như khi người dùng chọn sản phẩm để mua nhưng admin vô tình cùng lúc đó xóa sản phẩm sẽ dẫn đến lỗi bóng ma
