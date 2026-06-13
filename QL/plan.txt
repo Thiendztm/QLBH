@@ -1,12 +1,11 @@
-PROJECT: Quản lý bán hàng online (tập trung SQL, MySQL)
+PROJECT: Quản lý bán hàng 
 
-1) Mô tả tổng quan (viết lại ngắn gọn theo hướng CSDL)
-- Mục tiêu: thiết kế CSDL cho hệ thống bán hàng online (marketplace) với nhiều người mua
+1) Mô tả tổng quan 
+- Mục tiêu: thiết kế CSDL cho hệ thống bán hàng với nhiều người mua
   và sản phẩm/tồn kho, đặt hàng, thanh toán, vận chuyển.
 - Phạm vi: tập trung mô hình dữ liệu, ràng buộc, chỉ mục, truy vấn mẫu; có UI đơn giản.
-- Công nghệ: MySQL. Không triển khai web/UI, không cần backend.
 
-2) Thực thể và quan hệ chính (dự kiến)
+2) Thực thể và quan hệ chính 
 - nguoi_dung: lưu thông tin tài khoản người mua (có thể gộp vai trò admin).
 - danh_muc: phân loại sản phẩm.
 - san_pham: thông tin sản phẩm (thuộc danh_muc).
@@ -20,22 +19,23 @@ PROJECT: Quản lý bán hàng online (tập trung SQL, MySQL)
 - don_vi_van_chuyen: đối tác giao hàng.
 - van_chuyen: thông tin vận đơn và trạng thái giao hàng.
 
-3) Yêu cầu nghiệp vụ (tóm tắt)
+3) Yêu cầu nghiệp vụ 
 - Mỗi don_hang có >= 1 chi_tiet_don_hang.
 - Mỗi san_pham thuộc 1 danh_muc.
 - Tồn kho được quản lý theo san_pham và kho_hang.
 - Don_hang có thể thanh toán COD hoặc online.
 - Van_chuyen liên kết don_hang và don_vi_van_chuyen.
+- ...v...v...
 
-4) Đầu ra cần nộp (gợi ý)
+4) Đầu ra cần nộp 
 - ERD (sơ đồ quan hệ).
 - File SQL: tạo DB, tạo bảng, ràng buộc, chỉ mục.
 - Truy vấn mẫu: thống kê đơn hàng, top sản phẩm, tồn kho thấp...
 - Data mẫu (nếu cần) để demo truy vấn và kiểm thử ràng buộc.
 - UI đơn giản (mockup hoặc mô tả màn hình), không cần triển khai code.
 
-5) UI tối giản (gợi ý)
-- Đăng nhập/đăng ký (chỉ mô tả luồng).
+5) UI 
+- Đăng nhập/đăng ký 
 - Danh sách sản phẩm + tìm kiếm.
 - Chi tiết sản phẩm.
 - Giỏ hàng + đặt hàng.

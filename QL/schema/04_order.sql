@@ -1,31 +1,46 @@
--- don_hang
--- - don_hang_id (PK)
--- - nguoi_dung_id (FK -> nguoi_dung)
--- - dia_chi_id (FK -> dia_chi_giao_hang)
--- - tong_tien
--- - phi_van_chuyen
--- - trang_thai
--- - created_at
--- - updated_at
+create table don_hang (
+    don_hang_id tinyint not null auto_increment primary key,
+    nguoi_dung_id tinyint not null,
+    dia_chi_id tinyint not null,
+    tong_tien decimal(10, 2) not null,
+    phi_van_chuyen decimal(10, 2) not null,
+    trang_thai boolean default true,
+    created_at timestamp default current_timestamp,
+    updated_at timestamp default current_timestamp,
+    foreign key (nguoi_dung_id) references nguoi_dung(nguoi_dung_id),
+    foreign key (dia_chi_id) references dia_chi_giao_hang(dia_chi_id)
+);
 
--- chi_tiet_don_hang
--- - chi_tiet_id (PK)
--- - don_hang_id (FK -> don_hang)
--- - san_pham_id (FK -> san_pham)
--- - so_luong
--- - don_gia
--- - thanh_tien
+create table chi_tiet_don_hang (
+    chi_tiet_id tinyint not null auto_increment primary key,
+    don_hang_id tinyint not null,
+    san_pham_id tinyint not null,
+    so_luong int not null,
+    don_gia decimal(10, 2) not null,
+    thanh_tien decimal(10, 2) not null,
+    created_at timestamp default current_timestamp,
+    updated_at timestamp default current_timestamp,
+    foreign key (don_hang_id) references don_hang(don_hang_id),
+    foreign key (san_pham_id) references san_pham(san_pham_id)
+);
 
--- phuong_thuc_thanh_toan
--- - phuong_thuc_id (PK)
--- - ten_phuong_thuc
--- - loai (cod/online)
--- - trang_thai
+create table phuong_thuc_thanh_toan (
+    phuong_thuc_id tinyint not null auto_increment primary key,
+    ten_phuong_thuc varchar(20) not null,
+    loai varchar(10) not null check (loai in ('cod', 'online')),
+    created_at timestamp default current_timestamp,
+    updated_at timestamp default current_timestamp
+);
 
--- thanh_toan
--- - thanh_toan_id (PK)
--- - don_hang_id (FK -> don_hang)
--- - phuong_thuc_id (FK -> phuong_thuc_thanh_toan)
--- - so_tien
--- - trang_thai
--- - thoi_diem_thanh_toan
+create table thanh_toan (
+    thanh_toan_id tinyint not null auto_increment primary key,
+    don_hang_id tinyint not null,
+    phuong_thuc_id tinyint not null,
+    so_tien decimal(10, 2) not null,
+    trang_thai boolean default true,
+    thoi_diem_thanh_toan timestamp default current_timestamp,
+    created_at timestamp default current_timestamp,
+    updated_at timestamp default current_timestamp,
+    foreign key (don_hang_id) references don_hang(don_hang_id),
+    foreign key (phuong_thuc_id) references phuong_thuc_thanh_toan(phuong_thuc_id)
+);

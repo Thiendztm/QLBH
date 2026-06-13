@@ -1,17 +1,19 @@
--- danh_muc
--- - danh_muc_id (PK)
--- - ten_danh_muc
--- - danh_muc_cha_id (FK -> danh_muc, nullable)
--- - mo_ta
--- - created_at
--- - updated_at
+create table danh_muc (
+    danh_muc_id tinyint not null auto_increment primary key,
+    ten_danh_muc varchar(20) not null,
+    mo_ta varchar(50) null,
+    created_at timestamp default current_timestamp,
+    updated_at timestamp default current_timestamp
+);
 
--- san_pham
--- - san_pham_id (PK)
--- - danh_muc_id (FK -> danh_muc)
--- - ten_san_pham
--- - mo_ta
--- - gia_co_ban
--- - trang_thai
--- - created_at
--- - updated_at
+create table san_pham (
+    san_pham_id tinyint not null auto_increment primary key,
+    danh_muc_id tinyint not null,
+    ten_san_pham varchar(40) not null,
+    gia_co_ban decimal(10, 2) not null,
+    trang_thai boolean default true,
+    created_at timestamp default current_timestamp,
+    updated_at timestamp default current_timestamp,
+    foreign key (danh_muc_id) references danh_muc(danh_muc_id)
+);
+
