@@ -10,3 +10,23 @@ Người dùng cập nhật địa chỉ giao hàng nhưng chưa xác nhận ho�
 Người dùng A tiến hành đặt hàng và vào trang Xác nhận đơn hàng, hệ thống đọc địa chỉ giao hàng mặc định. Trong lúc đó người dùng B hoặc chính A trên thiết bị khác đăng nhập vào tài khoản và cập nhật địa chỉ mặc định và lưu thành công. Hệ thống của người A đọc địa chỉ giao hàng và tạo đơn sẽ không giống lần đọc đầu tiên.
 4. Bóng ma 
 Ng dùng A mở trang QL địa chỉ và hệ thống truy vấn dc danh sách gồm 3 địa chỉ. Trong lúc đó ng dùng B hoặc chính ng dùng A trên 1 thiết bị khác, thêm 1 địa chỉ mới và lưu thành công. Sau đó hệ thống bên A sẽ thực hiện lại truy vấn và hiển thị 3 địa chỉ thay vì 2 địa chỉ như ban đầu. 
+
+
+
+Phần 4: don_vi_van_chuyen, van_chuyen
+1. Lost Update (Mất dữ liệu cập nhật):
+Định nghĩa: Hai người cùng sửa một dữ liệu.
+Ví dụ: Hai nhân viên cùng cập nhật trạng thái đơn vận chuyển.
+Hậu quả: Người lưu sau ghi đè người lưu trước.
+2. Dirty Read (Đọc dữ liệu rác):
+Định nghĩa: Đọc dữ liệu chưa COMMIT.
+Ví dụ: Thấy đơn hàng đã giao nhưng sau đó bị ROLLBACK.
+Hậu quả: Đọc phải dữ liệu không tồn tại thật.
+3. Non-repeatable Read (Không đọc lại được):
+Định nghĩa: Đọc cùng một dòng dữ liệu hai lần nhưng kết quả khác nhau.
+Ví dụ: Lần đầu đơn đang giao, lần sau đơn đã giao.
+Hậu quả: Dữ liệu thay đổi giữa hai lần đọc.
+4. Phantom Read (Bóng ma):
+Định nghĩa: Đọc lại cùng truy vấn nhưng xuất hiện thêm hoặc mất dòng.
+Ví dụ: Lần đầu có 10 đơn đang giao, lần sau có 11 đơn.
+Hậu quả: Xuất hiện bản ghi mới như "bóng ma".
