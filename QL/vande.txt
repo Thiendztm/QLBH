@@ -1,2 +1,12 @@
 Bóng ma:
 ví dụ như khi người dùng chọn sản phẩm để mua nhưng admin vô tình cùng lúc đó xóa sản phẩm sẽ dẫn đến lỗi bóng ma
+
+Phần 1.
+1. Mất dữ liệu cập nhật 
+Người dùng mở thông tin Địa chỉ giao hàng trên 2 thiết bị khác nhau. Thiết bị A sửa sdt nhận hàng, thiết bị B sửa địa chỉ nhận hàng, dữ liệu lưu sau cùng sẽ ghi đè toàn bộ dữ liệu trước đó.
+2. Đọc dữ liệu rác
+Người dùng cập nhật địa chỉ giao hàng nhưng chưa xác nhận hoàn tất. Admin đọc ngay thông tin địa chỉ mới để tạo đơn hàng. Sau đó, người dùng gặp lỗi và bị hủy giao tác. Vậy dữ liệu đã đọc trở thành không hợp lệ.
+3. Không đọc lại dữ liệu
+Người dùng A tiến hành đặt hàng và vào trang Xác nhận đơn hàng, hệ thống đọc địa chỉ giao hàng mặc định. Trong lúc đó người dùng B hoặc chính A trên thiết bị khác đăng nhập vào tài khoản và cập nhật địa chỉ mặc định và lưu thành công. Hệ thống của người A đọc địa chỉ giao hàng và tạo đơn sẽ không giống lần đọc đầu tiên.
+4. Bóng ma 
+Ng dùng A mở trang QL địa chỉ và hệ thống truy vấn dc danh sách gồm 3 địa chỉ. Trong lúc đó ng dùng B hoặc chính ng dùng A trên 1 thiết bị khác, thêm 1 địa chỉ mới và lưu thành công. Sau đó hệ thống bên A sẽ thực hiện lại truy vấn và hiển thị 3 địa chỉ thay vì 2 địa chỉ như ban đầu. 
