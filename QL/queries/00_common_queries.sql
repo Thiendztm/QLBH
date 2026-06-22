@@ -21,6 +21,9 @@ call tao_dia_chi(7, 'BBBBBBBB', 'Phú Yên', 'Phú Hòa', 'Hòa An');
 -- call tao_donhang(dc_id,user_id,phi vc,sp_id,sl,id_kho, @new_don_hang_id);
 call tao_donhang(1,8, 30000, 8, 1, 1, @new_don_hang_id);
 
+-- giao tac thanh toan don hang
+call tao_thanh_toan_donhang(@new_don_hang_id, 2, @new_thanh_toan_id);
+
 --xem chi tiet user
 select * from v_nguoi_dung_chi_tiet 
 

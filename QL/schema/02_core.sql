@@ -13,7 +13,7 @@ CREATE TABLE nguoi_dung (
 
 create table dia_chi_giao_hang (
     dia_chi_id tinyint not null auto_increment primary key,
-    nguoi_dung_id tinyint not null,
+    nguoi_dung_id int not null,
     dia_chi nvarchar(20) not null,
     tinh_thanh nvarchar(20) not null,
     quan_huyen nvarchar(20) not null,

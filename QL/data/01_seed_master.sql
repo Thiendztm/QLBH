@@ -78,3 +78,7 @@ values
 (2, 31, 100),
 (2, 32, 100),
 (2, 33, 100);
+
+insert into phuong_thuc_thanh_toan(ten_phuong_thuc, loai) values
+('Thanh toán khi nhận hàng', 'cod'),
+('Chuyển khoản ngân hàng', 'online');

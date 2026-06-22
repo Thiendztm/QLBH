@@ -1,6 +1,6 @@
 create table don_hang (
     don_hang_id tinyint not null auto_increment primary key,
-    nguoi_dung_id tinyint not null,
+    nguoi_dung_id int not null,
     dia_chi_id tinyint not null,
     tong_tien decimal(10, 2) not null,
     phi_van_chuyen decimal(10, 2) not null,
@@ -31,6 +31,7 @@ create table phuong_thuc_thanh_toan (
     created_at timestamp default current_timestamp,
     updated_at timestamp default current_timestamp
 );
+
 
 create table thanh_toan (
     thanh_toan_id tinyint not null auto_increment primary key,

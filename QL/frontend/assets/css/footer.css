@@ -1,0 +1,59 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+:root {
+    --primary-color: #ffffff;
+    --menu-color: #090808;
+    --accent-color: #050709;
+    --text-light: #ffffff;
+}
+
+/* Toàn trang */
+body {
+    width: 100vw;
+    background-color: #f4f6f8;
+}
+
+.main {
+    width: 100vw;
+    min-height: auto;
+    flex: 1;
+}
+
+footer {
+    width:100%;
+    background-color:#f4f6f8;
+    color:#f4f6f8;
+    padding-bottom: 20px;
+}
+
+.chapter_footer {
+    max-width:1400px;
+    margin:auto;
+    display:flex;
+    align-items:flex-start;
+    gap:40px;
+}
+
+.left_footer,
+.right_footer,
+.center_footer {
+    flex:1;
+}
+
+#backToTop{
+    width: 40px;
+    height: 40px;
+    position: fixed;
+    bottom: 30px;
+    right: 15px;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    z-index: 999;
+}
