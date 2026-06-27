@@ -1,0 +1,380 @@
+PHAN TICH TRANH CHAP VA DEADLOCK TRONG HE THONG QUAN LY BAN HANG
+
+1. Muc tieu
+Tai lieu nay phan tich 4 hien tuong tranh chap co the xay ra trong co so du lieu, bao gom:
+- Mat du lieu cap nhat (Lost Update)
+- Doc du lieu rac (Dirty Read)
+- Khong doc lai duoc (Non-repeatable Read)
+- Bong ma (Phantom Read)
+- Deadlock
+
+Dong thoi, tai lieu dua ra cac vi du SQL co the mo phong loi va cach khac phuc bang dieu khien tu tranh trong MySQL/InnoDB.
+
+2. Ngu canh bai toan
+Project quan ly ban hang co cac nghiep vu de xay ra xung dot:
+- tao don hang va tru ton kho
+- cap nhat dia chi giao hang
+- thanh toan don hang
+- cap nhat trang thai van chuyen
+
+Trong do, nghiep vu tao don hang va tru ton kho la nghiep vu de tao ra tranh chap nhat.
+
+3. He quan tri su dung
+- MySQL
+- Storage engine: InnoDB
+
+InnoDB ho tro transaction, row-level lock, MVCC, gap lock, next-key lock va co co che phat hien deadlock.
+
+4. Cac hien tuong tranh chap va vi du SQL
+
+4.1. Mat du lieu cap nhat (Lost Update)
+Mo ta:
+Hai giao tac cung doc va cap nhat mot dong du lieu. Giao tac sau ghi de ket qua cua giao tac truoc.
+
+Vi du trong bai toan:
+Hai nhan vien cung sua cung mot dia chi giao hang. Nguoi luu sau se ghi de phan sua cua nguoi truoc.
+
+Cach mo phong:
+- Session A:
+```sql
+START TRANSACTION;
+SELECT * FROM dia_chi_giao_hang WHERE dia_chi_id = 1;
+UPDATE dia_chi_giao_hang SET dia_chi = 'So 1, Duong A' WHERE dia_chi_id = 1;
+-- chua COMMIT
+```
+- Session B:
+```sql
+START TRANSACTION;
+SELECT * FROM dia_chi_giao_hang WHERE dia_chi_id = 1;
+UPDATE dia_chi_giao_hang SET dia_chi = 'So 2, Duong B' WHERE dia_chi_id = 1;
+COMMIT;
+```
+- Quay lai Session A:
+```sql
+COMMIT;
+```
+Ket qua: gia tri cua Session B co the bi ghi de neu khong co khoa dong.
+
+Cach khac phuc:
+- Dung `SELECT ... FOR UPDATE` truoc khi cap nhat.
+- Cap nhat theo cung mot thu tu.
+- Neu can, dung optimistic locking.
+
+Muc MySQL/InnoDB ho tro:
+- Xu ly duoc khi dung `SELECT ... FOR UPDATE` va transaction.
+
+4.2. Doc du lieu rac (Dirty Read)
+Mo ta:
+Mot giao tac doc du lieu da duoc giao tac khac cap nhat nhung chua COMMIT. Neu giao tac do bi ROLLBACK, du lieu da doc la du lieu khong hop le.
+
+Vi du trong bai toan:
+He thong doc trang thai thanh toan cua don hang khi giao tac thanh toan chua hoan tat.
+
+Cach mo phong:
+- Session A:
+```sql
+START TRANSACTION;
+UPDATE thanh_toan
+SET trang_thai = 1
+WHERE thanh_toan_id = 1;
+-- chua COMMIT
+```
+- Session B:
+```sql
+SET SESSION TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;
+SELECT * FROM thanh_toan WHERE thanh_toan_id = 1;
+```
+- Session A:
+```sql
+ROLLBACK;
+```
+Ket qua: Session B da doc phai gia tri chua hop le.
+
+Cach khac phuc:
+- Khong dung `READ UNCOMMITTED`.
+- Dung `READ COMMITTED` hoac cao hon.
+
+Muc MySQL/InnoDB ho tro:
+- Co the ngan dirty read khi isolation level duoc dat dung.
+- Mac dinh InnoDB khong de dirty read xay ra o isolation an toan hon `READ UNCOMMITTED`.
+
+4.3. Khong doc lai duoc (Non-repeatable Read)
+Mo ta:
+Cung mot giao tac doc cung mot dong du lieu 2 lan nhung gia tri thay doi giua 2 lan doc do giao tac khac da COMMIT.
+
+Vi du trong bai toan:
+Lan dau he thong doc dia chi mac dinh cua nguoi dung, lan sau doc lai thi dia chi da bi doi.
+
+Cach mo phong:
+- Session A:
+```sql
+START TRANSACTION;
+SELECT * FROM dia_chi_giao_hang WHERE nguoi_dung_id = 1;
+```
+- Session B:
+```sql
+START TRANSACTION;
+UPDATE dia_chi_giao_hang
+SET dia_chi = 'Dia chi moi'
+WHERE dia_chi_id = 1;
+COMMIT;
+```
+- Session A:
+```sql
+SELECT * FROM dia_chi_giao_hang WHERE nguoi_dung_id = 1;
+COMMIT;
+```
+Ket qua: ket qua lan 1 va lan 2 khac nhau.
+
+Cach khac phuc:
+- Dung `REPEATABLE READ` hoac `SERIALIZABLE`.
+- Neu can doc de cap nhat ngay, dung `SELECT ... FOR UPDATE`.
+
+Muc MySQL/InnoDB ho tro:
+- Co MVCC nen `REPEATABLE READ` giam duoc van de nay.
+- Mac dinh MySQL/InnoDB thuong la `REPEATABLE READ`.
+
+4.4. Bong ma (Phantom Read)
+Mo ta:
+Cung mot cau truy van duoc thuc hien 2 lan, lan sau xuat hien them dong moi hoac mat dong cu.
+
+Vi du trong bai toan:
+Lan dau truy van danh sach dia chi cua nguoi dung co 3 dong, lan sau co them 1 dong moi.
+
+Cach mo phong:
+- Session A:
+```sql
+START TRANSACTION;
+SELECT * FROM dia_chi_giao_hang WHERE nguoi_dung_id = 1;
+```
+- Session B:
+```sql
+INSERT INTO dia_chi_giao_hang(nguoi_dung_id, dia_chi, tinh_thanh, quan_huyen, phuong_xa)
+VALUES (1, 'Dia chi moi', 'Ha Noi', 'Cau Giay', 'Yen Hoa');
+COMMIT;
+```
+- Session A:
+```sql
+SELECT * FROM dia_chi_giao_hang WHERE nguoi_dung_id = 1;
+COMMIT;
+```
+Ket qua: so dong tra ve co the tang len.
+
+Cach khac phuc:
+- Dung `SERIALIZABLE` neu muon chan hoan toan.
+- Hoac dung next-key lock/gap lock trong truong hop phu hop.
+
+Muc MySQL/InnoDB ho tro:
+- Co next-key lock va gap lock.
+- Co the giam phantom read tuy cau truy van va isolation level.
+
+4.5. Deadlock
+Mo ta:
+Hai giao tac giu tai nguyen cua nhau va moi giao tac deu cho tai nguyen ma giao tac khac dang nam giu.
+
+Vi du trong bai toan:
+- Giao tac A lock `ton_kho` roi lock `don_hang`
+- Giao tac B lock `don_hang` roi lock `ton_kho`
+
+Vi du mo phong:
+- Session A:
+```sql
+START TRANSACTION;
+SELECT * FROM ton_kho WHERE kho_hang_id = 1 AND san_pham_id = 1 FOR UPDATE;
+```
+- Session B:
+```sql
+START TRANSACTION;
+SELECT * FROM don_hang WHERE don_hang_id = 1 FOR UPDATE;
+```
+- Session A:
+```sql
+SELECT * FROM don_hang WHERE don_hang_id = 1 FOR UPDATE;
+```
+- Session B:
+```sql
+SELECT * FROM ton_kho WHERE kho_hang_id = 1 AND san_pham_id = 1 FOR UPDATE;
+```
+Ket qua: mot giao tac se bi MySQL phat hien deadlock va rollback.
+
+Cach khac phuc:
+- Lock tai nguyen theo cung mot thu tu.
+- Giam thoi gian giu lock.
+- Tach giao tac lon thanh giao tac nho hon.
+- Bat loi deadlock va thu lai giao tac.
+
+Muc MySQL/InnoDB ho tro:
+- Co co che phat hien deadlock va tu dong rollback 1 giao tac.
+
+5. Ap dung vao project cua toi
+Nghiep vu de gay tranh chap nhat la tao don hang va tru ton kho.
+
+Trong project, procedure hien tai da su dung:
+- `START TRANSACTION`
+- `SELECT ... FOR UPDATE` voi `ton_kho`
+- `INSERT` vao `don_hang`
+- `INSERT` vao `chi_tiet_don_hang`
+- `UPDATE` `ton_kho`
+- `UPDATE` `don_hang`
+- `COMMIT`
+
+Do do, nghiep vu nay la vi du tot nhat de bao cao ve dieu khien tu tranh theo kieu khoa (pessimistic concurrency control).
+
+6. Lua chon van de de bao cao chinh
+Nhat nen chon: Lost Update khi tru ton kho trong luc tao don hang.
+
+Ly do:
+- Gan voi nghiep vu that trong ban hang.
+- De mo phong bang 2 session.
+- De noi ve `SELECT ... FOR UPDATE` va transaction.
+- De lien he truc tiep voi code hien co cua project.
+
+7. Cach viet ngan gon de bao cao
+- Neu khong co dieu khien tu tranh, 2 giao tac co the cung tru ton kho va gay mat du lieu cap nhat.
+- Su dung `SELECT ... FOR UPDATE` de lock dong ton_kho truoc khi cap nhat.
+- Toan bo cac buoc tao don, them chi tiet, tru ton kho duoc dat trong 1 transaction.
+- MySQL/InnoDB co ho tro transaction, row-level lock va phat hien deadlock, nen co the xu ly cac van de tren neu dung dung cach.
+
+8. Cac tinh huong mo rong co the xay ra trong project
+
+8.1. Hai nguoi cung mua san pham cuoi cung
+Bang lien quan: `san_pham`, `ton_kho`, `don_hang`, `chi_tiet_don_hang`
+
+Tinh huong:
+- Khach A va khach B cung dat mua cung 1 san pham.
+- Ton kho hien chi con 1.
+- Neu khong co khoa dong, ca 2 giao tac co the deu thay con hang va cung tru kho.
+
+Rui ro:
+- Ton kho am.
+- Don hang duoc tao nhung khong con hang de giao.
+
+Cach xu ly:
+- `SELECT so_luong ... FOR UPDATE` tren dong `ton_kho`.
+- Chi cho phep 1 giao tac tru kho.
+
+8.2. Admin doi gia san pham trong luc khach dang dat hang
+Bang lien quan: `san_pham`, `don_hang`, `chi_tiet_don_hang`
+
+Tinh huong:
+- Khach A da chon san pham vao don.
+- Admin sua `gia_co_ban` cua san pham truoc khi A xac nhan.
+
+Rui ro:
+- Don hang co the tinh sai don gia neu he thong lay gia theo thoi diem khac nhau.
+
+Cach xu ly:
+- Khi tao chi tiet don hang, lay va luu lai `don_gia` vao `chi_tiet_don_hang`.
+- Khong tinh lai don gia cua don cu theo gia hien tai cua `san_pham`.
+
+8.3. Xac nhan thanh toan khi don hang dang bi huy
+Bang lien quan: `don_hang`, `thanh_toan`, `phuong_thuc_thanh_toan`
+
+Tinh huong:
+- Mot giao tac dang xac nhan thanh toan.
+- Mot giao tac khac dang huy don hoac doi trang thai don.
+
+Rui ro:
+- Don vua bi huy nhung van co giao dich thanh toan.
+
+Cach xu ly:
+- Khoa dong ban ghi `don_hang` truoc khi tao `thanh_toan`.
+- Kiem tra trang thai don truoc khi insert vao `thanh_toan`.
+
+8.4. Cap nhat trang thai van chuyen trong luc khach dang xem
+Bang lien quan: `don_vi_van_chuyen`, `van_chuyen`
+
+Tinh huong:
+- Nhan vien giao hang cap nhat don da giao.
+- Khach hang dang xem trang thai don.
+
+Rui ro:
+- Trang thai co the nhay qua lai neu cac cap nhat xay ra cung luc.
+
+Cach xu ly:
+- Khi cap nhat `van_chuyen`, dung transaction va khoa dong dong du lieu.
+- Luu log lich su trang thai neu can truy vet.
+
+8.5. Nguoi dung them dia chi moi trong luc dang chon dia chi mac dinh
+Bang lien quan: `nguoi_dung`, `dia_chi_giao_hang`
+
+Tinh huong:
+- Nguoi dung dang o man hinh chon dia chi giao hang.
+- Tren thiet bi khac, nguoi dung them dia chi moi.
+
+Rui ro:
+- Danh sach dia chi thay doi giua 2 lan load.
+
+Cach xu ly:
+- Dung isolation level `REPEATABLE READ` neu muon danh sach on dinh trong 1 phien.
+- Neu can khong cho chen chen, dung `SERIALIZABLE` cho truy van danh sach.
+
+8.6. Bong ma trong danh sach don hang theo trang thai
+Bang lien quan: `don_hang`
+
+Tinh huong:
+- Quan tri vien dang xem danh sach don hang `dang_giao`.
+- Cung luc co them 1 don moi vao trang thai nay.
+
+Rui ro:
+- Ket qua truy van lan sau co them dong moi.
+
+Cach xu ly:
+- Dung `REPEATABLE READ` de on dinh ket qua doc.
+- Neu can dem so luong chinh xac trong moi thoi diem, dung `SERIALIZABLE`.
+
+8.7. Deadlock giua thanh toan va don hang
+Bang lien quan: `don_hang`, `thanh_toan`
+
+Tinh huong:
+- Session A lock `don_hang` truoc, roi mo sang `thanh_toan`.
+- Session B lock `thanh_toan` truoc, roi quay lai `don_hang`.
+
+Rui ro:
+- Hai giao tac giu lock cheo nhau va bi treo.
+
+Cach xu ly:
+- Quy dinh thu tu lock co dinh: `don_hang` -> `thanh_toan` -> `van_chuyen`.
+- Neu bi deadlock, cho MySQL rollback 1 giao tac va thu lai.
+
+9. Neu muon sang tao them bang phu tro
+
+Khong bat buoc phai them, nhung neu muon bai bao cao phong phu hon, co the de xuat them cac bang sau:
+
+9.1. `lich_su_trang_thai_don_hang`
+- Luu lich su cac lan doi trang thai don hang.
+- Tinh huong: 1 don hang co the co nhieu lan cap nhat trang thai.
+- Loi co the co: 2 giao tac cung them 1 dong lich su cho cung 1 trang thai.
+
+9.2. `gio_hang`
+- Luu san pham ma nguoi dung tam thoi chon mua.
+- Tinh huong: nguoi dung them/xoa san pham o 2 tab cung luc.
+- Loi co the co: lost update khi cap nhat so luong gio hang.
+
+9.3. `phieu_nhap_kho`
+- Luu cac dot nhap hang vao kho.
+- Tinh huong: 2 nhan vien cung nhap hang vao 1 kho cung luc.
+- Loi co the co: ton kho bi tang sai neu khong khoa dong.
+
+9.4. `yeu_cau_hoan_tien`
+- Luu yeu cau hoan tien khi thanh toan bi huy/tra lai.
+- Tinh huong: mot don vua bi xac nhan hoan tien trong khi trang thai thanh toan dang thay doi.
+- Loi co the co: trang thai don va trang thai thanh toan bi lech nhau.
+
+10. Goi y chon 1 tinh huong de bao ve truoc lop
+
+Neu can chon 1 tinh huong de trinh bay dep va gan voi code hien co, nen chon:
+- Hai nguoi cung mua san pham cuoi cung.
+
+Ly do:
+- Co lien he truc tiep voi `ton_kho` va `don_hang`.
+- De mo phong bang 2 session.
+- De giai thich ro `SELECT ... FOR UPDATE`.
+- Gan voi nghiep vu that nhat cua web ban hang.
+
+Neu can, co the minh hoa them bang 2 phien:
+- Phien 1: lock dong ton kho
+- Phien 2: cho lock hoac bi rollback
+- Phien 1: commit
+
+Ket qua cho thay he thong chi cho 1 giao tac cap nhat thanh cong, tranh ban qua so luong ton kho.

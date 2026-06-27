@@ -1,20 +1,10 @@
-
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
-    <link rel="stylesheet" href="../assets/css/home.css">
-</head>
-<body>
     <?php
-                $conn = mysqli_connect("localhost","root","","qlbh",3307);
-                if ($conn -> connect_error) {
-                    die("Connection failed: " . $conn -> connect_error);
+                session_start();
+                include "../config/db.php";
+                if (isset($_SESSION['id'])) {
+                    $tkid="A" . str_pad($_SESSION['id'], 8, "0", STR_PAD_LEFT); 
                 }
-
+                
                 $danhMucId = $_GET['danh_muc'] ?? null;
 
                 if ($danhMucId) { 
@@ -24,8 +14,41 @@
                 }
 
                 $result = $conn -> query($sql);
-                
-    ?>
+
+                if (isset($_POST['them_gio'])) {
+
+                if (!isset($_SESSION['id'])) {
+                    header("Location: login.php");
+                    exit();
+                } else {
+
+                    $nguoi_dung = $_SESSION['id'];
+                    $san_pham = $_POST['san_pham_id'];
+
+                    $sql = "CALL them_gio_hang($nguoi_dung, $san_pham, 1)";
+
+                    if (mysqli_query($conn, $sql)) {
+                        header("Location: home.php");
+                        exit();
+                    } else {
+                        echo mysqli_error($conn);
+                    }
+
+                }
+
+            }
+
+                   
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <link rel="stylesheet" href="../assets/css/home.css">
+</head>
+<body>
     <div class="main">
 
         <div class="dashboard" id="dashboard">
@@ -68,9 +91,15 @@
                                     <h3>
                                         <?= $row['ten_san_pham'] ?>
                                     </h3>
-                                    <p>
-                                        <?= $row['gia_co_ban'] ?>
-                                    </p>
+                                    <div class="sp_price" style="display: flex; justify-content: space-between; align-items: center;">
+                                        <p>
+                                            <?= $row['gia_co_ban'] ?>
+                                        </p>
+                                        <form method="POST">
+                                            <input type="hidden" name="san_pham_id" value="<?= $row['san_pham_id']?>">
+                                            <button type="submit" name="them_gio" style="color:black;">Mua</button>
+                                        </form>
+                                    </div>
                                 </div>
                             <?php
                         }
@@ -79,10 +108,11 @@
                 </div>
             </div>
         </div>
+        <div class="">
+            <img src="../assets/imgs/arrow.png" alt="arrow" class="back_to_top" id="backToTop">
+        </div>
         
     </div>
 </body>
-<?php
-include "../includes/footer.php";
-?>
+<script src="../assets/js/tienichchung.js"></script>
 </html>

@@ -34,7 +34,8 @@ body {
     display: flex;
     flex-direction: column;
     border: 1px solid #ccc;
-    padding: 10px;
+    padding: 12px;
+    margin-top: 20px;
 }
 
 .sp_card h3 {
@@ -103,4 +104,16 @@ body {
 .sidebar_responsive {
     display: inline;
     position: absolute;
+}
+#backToTop{
+    width: 40px;
+    height: 40px;
+    position: fixed;
+    bottom: 30px;
+    right: 15px;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    z-index: 999;
 }

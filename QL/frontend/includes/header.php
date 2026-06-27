@@ -1,5 +1,7 @@
-    <?php
-// Kiểm tra nếu biến $title đã được đặt, nếu chưa thì gán giá trị mặc định
+<?php
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
 if (!isset($title)) {
     $title = "Header";
 }
@@ -30,7 +32,7 @@ if (!isset($title)) {
             <div class="user">
                     <div class="right_header" style="display:flex; flex-direction: row; gap: 10px; align-items: center;">
                         <div class="cart_btn" style="padding: 5px;" >
-                            <img class="icon cart" src="../assets/imgs/gio-hang.png" alt="Cart" style="width: 45px; height: 45px; cursor: pointer; margin-top: 5px;" onclick="navToPage('cart.php')">
+                            <img class="icon cart" src="../assets/imgs/gio-hang.png" alt="Cart" style="width: 45px; height: 45px; cursor: pointer; margin-top: 5px;" onclick="navToPage('carts.php')">
                         </div>
                         <div id="account_btn">
                             <img class="icon_user" src="../assets/imgs/user1.png" alt="User">
@@ -48,24 +50,41 @@ if (!isset($title)) {
                                     </div>
                                     <img class="avatar_edit" src="../assets/imgs/edit1.png" alt="edit">
                                 </div>
-                                <span>user_name</span>
+                                <?php
+                                    if (isset($_SESSION['id'])) :?>
+                                        <span><?= $_SESSION['name'] ?></span>
+                                    <?php else: ?>
+                                        <span>Khách</span>
+                                    <?php endif; 
+                                ?>
                             </div>
-                            <div class="acc_title_box">
+                            <?php if (isset($_SESSION['id'])): ?>
+
+                                <div class="acc_title_box">
                                     <div class="acc_title">
                                         <div class="acc_detail_1">
                                             <span>TK ID:</span>
-                                            <span>A111110001</span>
+                                            <span><?= $tkid ?></span>
                                         </div>
+
                                         <div class="acc_detail_2">
-                                            <span>gmail:</span>
-                                            <span>user@gmail.com</span>
+                                            <span>Email:</span>
+                                            <span><?= $_SESSION['email'] ?></span>
                                         </div>
                                     </div>
-                            </div>
-                           
-<!-- 
-                            <button class="login-btn">Đăng nhập</button>
-                            <button class="regis-btn">Đăng ký</button> -->
+                                </div>
+
+                            <?php else: ?>
+
+                                <button class="login-btn" onclick="navToPage('login.php')" style="color: black;">
+                                    Đăng nhập
+                                </button>
+
+                                <button class="regis-btn" onclick="navToPage('register.php')">
+                                    Đăng ký
+                                </button>
+
+                            <?php endif; ?>
                         </div>
 
                         <div class="acc_mid">
@@ -80,7 +99,7 @@ if (!isset($title)) {
                                         <p>Danh sách sản phẩm yêu thích</p>
                                     </div>
                                 </div>
-                                <div class="acc_item2" onclick="navToPage('savedcar.php')">
+                                <div class="acc_item2" onclick="navToPage('carts.php')">
                                     <div class="acc_img">
                                         <img src="../assets/imgs/archive.png" alt="archive" class="acc_icon">
                                     </div>
@@ -119,7 +138,7 @@ if (!isset($title)) {
                                         <img src="../assets/imgs/logout.png" alt="đăng xuất" class="acc_icon">
                                     </div>
                                     <div class="item_content_text">
-                                        <a href="login.php">Đăng xuất</a>
+                                        <a href="logout.php">Đăng xuất</a>
                                         <p>Đăng xuất khỏi tài khoản</p>
                                     </div>
                                 </div>
