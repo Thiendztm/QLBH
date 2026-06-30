@@ -67,3 +67,5 @@ create table chi_tiet_gio_hang (
     foreign key (gio_hang_id) references gio_hang(gio_hang_id),
     foreign key (san_pham_id) references san_pham(san_pham_id)
 );
+
+alter table chi_tiet_gio_hang add unique(gio_hang_id, san_pham_id);

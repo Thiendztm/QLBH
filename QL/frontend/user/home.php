@@ -1,42 +1,40 @@
-    <?php
-                session_start();
-                include "../config/db.php";
-                if (isset($_SESSION['id'])) {
-                    $tkid="A" . str_pad($_SESSION['id'], 8, "0", STR_PAD_LEFT); 
-                }
+<?php
+    session_start();
+    include "../config/db.php";
+    mysqli_query($conn, "SET SESSION TRANSACTION ISOLATION LEVEL READ UNCOMMITTED");
                 
-                $danhMucId = $_GET['danh_muc'] ?? null;
+    $danhMucId = $_GET['danh_muc'] ?? null;
 
-                if ($danhMucId) { 
-                    $sql = "select * from san_pham where danh_muc_id = $danhMucId";
-                } else {
-                    $sql = "select * from san_pham";
-                }
+    if ($danhMucId) { 
+        $sql = "select * from san_pham where danh_muc_id = $danhMucId";
+    } else {
+        $sql = "select * from san_pham";
+    }
 
-                $result = $conn -> query($sql);
+    $result = $conn -> query($sql);
+    
+    if (isset($_POST['them_gio'])) {
 
-                if (isset($_POST['them_gio'])) {
+    if (!isset($_SESSION['id'])) {
+        header("Location: login.php");
+        exit();
+    } else {
 
-                if (!isset($_SESSION['id'])) {
-                    header("Location: login.php");
-                    exit();
-                } else {
+        $nguoi_dung = $_SESSION['id'];
+        $san_pham = $_POST['san_pham_id'];
 
-                    $nguoi_dung = $_SESSION['id'];
-                    $san_pham = $_POST['san_pham_id'];
+        $sql = "CALL them_gio_hang($nguoi_dung, $san_pham, 1)";
 
-                    $sql = "CALL them_gio_hang($nguoi_dung, $san_pham, 1)";
+        if (mysqli_query($conn, $sql)) {
+            header("Location: home.php");
+                exit();
+        } else {
+            echo mysqli_error($conn);
+        }
 
-                    if (mysqli_query($conn, $sql)) {
-                        header("Location: home.php");
-                        exit();
-                    } else {
-                        echo mysqli_error($conn);
-                    }
+    }
 
-                }
-
-            }
+}
 
                    
 ?>

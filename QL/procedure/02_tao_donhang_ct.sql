@@ -71,3 +71,66 @@ begin
     commit;
 end;
 
+--bỏ cái trên
+
+
+--này tạo đơn hàng
+create procedure tao_donhang1(
+    in p_nguoi_dung_id tinyint,
+    in p_dia_chi_id tinyint,
+    out p_don_hang_id tinyint
+)
+begin
+    
+    insert into don_hang(nguoi_dung_id, dia_chi_id, tong_tien, phi_van_chuyen)
+    values (p_nguoi_dung_id, p_dia_chi_id,0,15000);
+
+    set p_don_hang_id = last_insert_id();
+end;
+drop procedure if exists tao_donhang1;
+
+--ghi chi tiết đơn hàng
+create procedure them_chi_tiet_donhang(
+    in p_don_hang_id int,
+    in p_san_pham_id int,
+    in p_so_luong int
+)
+begin
+
+declare v_don_gia decimal(10, 2);
+
+select gia_co_ban into v_don_gia from san_pham where san_pham_id = p_san_pham_id;
+
+insert into chi_tiet_don_hang(don_hang_id, san_pham_id, so_luong, don_gia, thanh_tien)
+values (p_don_hang_id, p_san_pham_id, p_so_luong, v_don_gia, v_don_gia * p_so_luong);
+
+update don_hang
+set tong_tien = (select sum(thanh_tien) from chi_tiet_don_hang where don_hang_id = p_don_hang_id) + phi_van_chuyen
+where don_hang_id = p_don_hang_id;
+
+end;
+drop procedure if exists them_chi_tiet_donhang;
+
+
+--kiem tra toonf kho
+create procedure xu_ly_ton_kho(
+    in p_san_pham_id tinyint,
+    in p_so_luong int
+)
+begin 
+    declare v_ton int;
+
+    select so_luong into v_ton from ton_kho where san_pham_id = p_san_pham_id;
+    do sleep(10);
+
+    if v_ton < p_so_luong then
+        signal sqlstate '45000'
+            set message_text = N'Tồn kho không đủ';
+    end if;
+
+    update ton_kho
+    set so_luong = v_ton - p_so_luong,
+        updated_at = current_timestamp
+    where san_pham_id = p_san_pham_id;
+end;
+drop procedure if exists xu_ly_ton_kho;

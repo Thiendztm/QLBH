@@ -1,0 +1,88 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+:root {
+    --primary-color: #ffffff;
+    --menu-color: #090808;
+    --accent-color: #050709;
+    --text-light: #ffffff;
+    --column-color: #f4f6f8;
+}
+
+/* Toàn trang */
+body {
+    width: 100vw;
+    background-color: #f4f6f8;
+}
+
+.main {
+    width: 100vw;
+    flex: 1;
+}
+
+.address_box,
+.cart_item,
+.payment_method,
+.summary_box {
+    display: flex;
+    flex-direction: column;
+    background-color: #ffffff;
+    margin: 50px;
+    padding: 30px;
+    border-radius: 20px;
+}
+.address_grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.item_info {
+    margin-top: 20px;
+    display: grid;
+    align-items: center;
+    grid-template-columns: 0.25fr 1fr 1fr 1fr 1fr;
+}
+.payment_method {
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.summary_box {
+    position: relative;
+}
+
+.summary_item {
+    display: flex;
+    flex-direction: column;
+    text-align: right;
+    top: 0;
+    right: 0;
+    margin-top: 10px;
+}
+
+.summary_item span {
+    font-size: 18px;
+    color: green;
+    margin-bottom: 10px;
+}
+.summary_box strong {
+    font-size: 25px;
+    margin-bottom: 10px;
+}
+.summary_box button {
+    bottom: 30px;
+    right: 0;
+    width: 200px;
+    height: 50px;
+    background-color: #32b61e;
+    color: #ffffff;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+}

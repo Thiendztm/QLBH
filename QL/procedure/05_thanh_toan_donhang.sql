@@ -1,4 +1,3 @@
-delimiter $$
 
 create procedure tao_thanh_toan_donhang(
     in p_don_hang_id tinyint,
@@ -9,14 +8,6 @@ begin
     declare v_so_tien decimal(10, 2);
     declare v_loai varchar(10);
     declare v_ten_phuong_thuc varchar(20);
-
-    declare exit handler for sqlexception
-    begin
-        rollback;
-        resignal;
-    end;
-
-    start transaction;
 
     select tong_tien
     into v_so_tien
@@ -57,8 +48,6 @@ begin
     set updated_at = current_timestamp
     where don_hang_id = p_don_hang_id;
 
-    commit;
-
     select
         p_thanh_toan_id as thanh_toan_id,
         p_don_hang_id as don_hang_id,
@@ -66,6 +55,5 @@ begin
         v_loai as loai,
         v_so_tien as so_tien,
         'da_xac_nhan_thanh_toan' as trang_thai;
-end$$
-
-delimiter ;
+end;
+drop procedure if exists tao_thanh_toan_donhang;

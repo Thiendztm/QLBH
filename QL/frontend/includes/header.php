@@ -2,6 +2,11 @@
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
+
+if (isset($_SESSION['id'])) {
+    $tkid="A" . str_pad($_SESSION['id'], 8, "0", STR_PAD_LEFT); 
+}
+
 if (!isset($title)) {
     $title = "Header";
 }
@@ -21,7 +26,7 @@ if (!isset($title)) {
     <div class="main-header">
         <header>
             <div class="logo">
-                <img src="../assets/imgs/" alt="Logo">
+                <img src="../assets/imgs/logo.png" alt="Logo" style="width:50px; height:50px;" onclick="navToPage('home.php')">
             </div>
             <div class="search">
                 <form class="search-icon">

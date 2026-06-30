@@ -31,3 +31,18 @@ begin
     end if;
     commit;
 end;
+
+--xóa giỏ hàng
+create procedure xoa_gio_hang(
+    in p_nguoi_dung_id int
+)
+begin
+declare v_gio_hang tinyint;
+select gio_hang_id into v_gio_hang from gio_hang where nguoi_dung_id = p_nguoi_dung_id and trang_thai = 1;
+
+delete from chi_tiet_gio_hang where gio_hang_id = v_gio_hang;
+
+delete from gio_hang where gio_hang_id = v_gio_hang;
+
+end;
+drop procedure if exists xoa_gio_hang;
